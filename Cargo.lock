@@ -453,6 +453,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "djanco-python2"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "clap 3.0.0-beta.2",
+ "djanco",
+ "djanco_ext",
+]
+
+[[package]]
 name = "djanco_ext"
 version = "0.1.2"
 source = "git+https://github.com/PRL-PRG/djanco_ext#864c3b282b8a7c7b662f4bbdff77b79befc50677"
@@ -1047,16 +1057,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0d8caf72986c1a598726adc988bb5984792ef84f5ee5aa50209145ee8077038"
 dependencies = [
  "unicode-xid 0.2.2",
-]
-
-[[package]]
-name = "python-2"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "clap 3.0.0-beta.2",
- "djanco",
- "djanco_ext",
 ]
 
 [[package]]
