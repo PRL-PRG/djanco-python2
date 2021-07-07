@@ -33,10 +33,21 @@ pub fn all_projects_containing_python(database: &Database, _log: &Log, output: &
         .into_csv_in_dir(output, "all_projects_containing_python_files.csv")
 }
 
-#[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_commits(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .into_csv_in_dir(output, "all_commits.csv")
+}
+
+#[djanco(June, 2021, subsets(Python))]
+pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.commits()
+        .map_into(commit::Changes)
+        .flat_map(|option| option)
+        // Auxiliary: flatten from a stream of vectors of changes to a stream of changes.
+        .flat_map(|vector| vector)
+        // Select changes where the changed file has the extensions associated with Python.
+        .into_csv_in_dir(output, "all_changes.csv")
 }
 
 // #[djanco(June, 2021, subsets(Python))]
