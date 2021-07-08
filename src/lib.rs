@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fs::OpenOptions;
 use std::path::Path;
 use std::path::PathBuf;
@@ -39,7 +40,7 @@ pub fn all_commits(database: &Database, _log: &Log, output: &Path) -> Result<(),
         .into_csv_in_dir(output, "all_commits.csv")
 }
 
-#[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::Changes)
@@ -48,6 +49,30 @@ pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(),
         .flat_map(|vector| vector)
         // Select changes where the changed file has the extensions associated with Python.
         .into_csv_in_dir(output, "all_changes.csv")
+}
+
+#[djanco(June, 2021, subsets(Python))]
+pub fn all_paths(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.commits()
+        .map_into(commit::Paths)
+        .flat_map(|option| option)
+        // Auxiliary: flatten from a stream of vectors of changes to a stream of changes.
+        .flat_map(|vector| vector)
+        // Select changes where the changed file has the extensions associated with Python.
+        .unique()
+        .into_csv_in_dir(output, "all_paths.csv")
+}
+
+#[djanco(June, 2021, subsets(Python))]
+pub fn all_snapshot_ids(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.commits()
+        .map_into(commit::SnapshotIds)
+        .flat_map(|option| option)
+        // Auxiliary: flatten from a stream of vectors of changes to a stream of changes.
+        .flat_map(|vector| vector)
+        // Select changes where the changed file has the extensions associated with Python.
+        .unique()
+        .into_csv_in_dir(output, "all_snapshot_ids.csv")
 }
 
 // #[djanco(June, 2021, subsets(Python))]
