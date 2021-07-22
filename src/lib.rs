@@ -96,7 +96,7 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
     }).into_csv_with_headers_in_dir(
         vec!["commit_hash", "changes", "is_python", "timestamp", "dec_2008", "before_dec_2008", "date"],
             output, 
-            "python_changes_before_dec_2008.csv")
+            "python_commit_debug.csv")
 }    
 
 #[djanco(June, 2021, subsets(Python))]
