@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::fs::OpenOptions;
 use std::path::Path;
 use std::path::PathBuf;
@@ -16,7 +15,7 @@ use djanco::objects::*;
 
 use djanco_ext::*;
 
-// #[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_python_projects(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.projects()
         // Select all projects which are have Python declared as their major language in GitHub.
@@ -25,7 +24,7 @@ pub fn all_python_projects(database: &Database, _log: &Log, output: &Path) -> Re
         .into_csv_in_dir(output, "all_python_projects.csv")
 }
 
-// #[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_projects_containing_python(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.projects()
         // Select all projects which have Python as one of their constituent languages in GitHub: there's at least one
@@ -51,7 +50,7 @@ pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(),
         .into_csv_in_dir(output, "all_changes.csv")
 }
 
-#[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_paths(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::Paths)
@@ -59,11 +58,10 @@ pub fn all_paths(database: &Database, _log: &Log, output: &Path) -> Result<(), s
         // Auxiliary: flatten from a stream of vectors of changes to a stream of changes.
         .flat_map(|vector| vector)
         // Select changes where the changed file has the extensions associated with Python.
-        .unique()
         .into_csv_in_dir(output, "all_paths.csv")
 }
 
-#[djanco(June, 2021, subsets(Python))]
+//#[djanco(June, 2021, subsets(Python))]
 pub fn all_snapshot_ids(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::SnapshotIds)
@@ -71,11 +69,37 @@ pub fn all_snapshot_ids(database: &Database, _log: &Log, output: &Path) -> Resul
         // Auxiliary: flatten from a stream of vectors of changes to a stream of changes.
         .flat_map(|vector| vector)
         // Select changes where the changed file has the extensions associated with Python.
-        .unique()
         .into_csv_in_dir(output, "all_snapshot_ids.csv")
 }
 
-// #[djanco(June, 2021, subsets(Python))]
+#[djanco(June, 2021, subsets(Python))]
+pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.commits().map(|commit| {
+        let hash = commit.hash().unwrap_or_else(String::new);
+
+        let change_count = commit.change_count().unwrap_or(0);
+
+        let languages = commit.languages().unwrap_or_else(Vec::new);
+        let is_python = languages.contains(&Language::Python);
+
+        let timestamp = commit.author_timestamp();
+        let dec_2008 = timestamp!(December 2008);
+        let before_dec_2008 = timestamp.map_or(false, |date| {
+            date < timestamp!(December 2008)
+        });
+
+        let date = timestamp.map(|t| {
+            t.as_utc_rfc2822_string()
+        }).unwrap_or_else(String::new);
+
+        (hash, change_count, is_python, timestamp, dec_2008, before_dec_2008, date)
+    }).into_csv_with_headers_in_dir(
+        vec!["commit_hash", "changes", "is_python", "timestamp", "dec_2008", "before_dec_2008", "date"],
+            output, 
+            "python_changes_before_dec_2008.csv")
+}    
+
+#[djanco(June, 2021, subsets(Python))]
 pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
 
     let changes = database.commits() 

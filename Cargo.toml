@@ -12,3 +12,4 @@ clap = "3.0.0-beta.2"
 djanco = { git = "https://github.com/PRL-PRG/djanco", branch = "main" }
 djanco_ext = { git = "https://github.com/PRL-PRG/djanco_ext" }
 chrono = "0.4.19"
+itertools = "0.10.1" 
