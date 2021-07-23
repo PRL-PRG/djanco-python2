@@ -88,13 +88,13 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
             date < timestamp!(December 2008)
         });
 
-        let date = timestamp.map(|t| {
-            t.as_utc_rfc2822_string()
-        }).unwrap_or_else(String::new);
+        //let date = timestamp.map(|t| {
+        //    t.as_utc_rfc2822_string()
+        //}).unwrap_or_else(String::new);
 
-        (hash, change_count, is_python, timestamp, dec_2008, before_dec_2008, date)
+        (hash, change_count, is_python, timestamp, dec_2008, before_dec_2008)//, date)
     }).into_csv_with_headers_in_dir(
-        vec!["commit_hash", "changes", "is_python", "timestamp", "dec_2008", "before_dec_2008", "date"],
+        vec!["commit_hash", "changes", "is_python", "timestamp", "dec_2008", "before_dec_2008"], //"date"],
             output, 
             "python_commit_debug.csv")
 }    
