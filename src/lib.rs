@@ -96,7 +96,7 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
     }).into_csv_in_dir(output, "python_commit_debug.csv")
 }
 
-// #[djanco(June, 2021, subsets(Python))]
+#[djanco(June, 2021, subsets(Python))]
 pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     let mut snapshot_dir = PathBuf::from(output);
     snapshot_dir.push("python_snapshots_before_dec2008-2");
@@ -120,6 +120,9 @@ pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) ->
         //}).unwrap_or_else(String::new);
 
         if is_python && before_dec_2008 {
+
+            println!("commit {} contains Python from before Dec 2008", hash);
+
             let changes: Vec<ItemWithData<Change>> = commit.changes_with_data().unwrap_or_else(Vec::new);
             let python_changes: Vec<ItemWithData<Change>> = changes.into_iter()
                 .filter(|change| {
@@ -138,7 +141,7 @@ pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) ->
                 .collect();
             let python_snapshot_count = python_snapshots.len();
                 
-            println!("commit {} contains Python from before Dec 2008: {} changes,  {} Python paths, {} Python snapshots", 
+            println!("commit {} contains Python from before Dec 2008: {} changes, {} Python paths, {} Python snapshots", 
                      hash, change_count, python_changes_count, python_snapshot_count);
 
             python_snapshots
