@@ -15,7 +15,14 @@ use djanco::objects::*;
 
 use djanco_ext::*;
 
-//#[djanco(June, 2021, subsets(Python))]
+#[djanco(subsets(Generic))]
+pub fn all_projects(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.projects()
+        // Print out basic project summary for each selected project as a line in a CSV file.
+        .into_csv_in_dir(output, "all_projects.csv")
+}
+
+#[djanco(subsets(Generic))]
 pub fn all_python_projects(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.projects()
         // Select all projects which are have Python declared as their major language in GitHub.
@@ -24,7 +31,7 @@ pub fn all_python_projects(database: &Database, _log: &Log, output: &Path) -> Re
         .into_csv_in_dir(output, "all_python_projects.csv")
 }
 
-//#[djanco(June, 2021, subsets(Python))]
+#[djanco(subsets(Generic))]
 pub fn all_projects_containing_python(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.projects()
         // Select all projects which have Python as one of their constituent languages in GitHub: there's at least one
@@ -33,13 +40,13 @@ pub fn all_projects_containing_python(database: &Database, _log: &Log, output: &
         .into_csv_in_dir(output, "all_projects_containing_python_files.csv")
 }
 
-//#[djanco(June, 2021, subsets(Python))]
+//#[djanco(subsets(Generic))]
 pub fn all_commits(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .into_csv_in_dir(output, "all_commits.csv")
 }
 
-//#[djanco(June, 2021, subsets(Python))]
+//#[djanco(subsets(Generic))]
 pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::Changes)
@@ -50,7 +57,7 @@ pub fn all_changes(database: &Database, _log: &Log, output: &Path) -> Result<(),
         .into_csv_in_dir(output, "all_changes.csv")
 }
 
-//#[djanco(June, 2021, subsets(Python))]
+//#[djanco(subsets(Generic))]
 pub fn all_paths(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::Paths)
@@ -61,7 +68,7 @@ pub fn all_paths(database: &Database, _log: &Log, output: &Path) -> Result<(), s
         .into_csv_in_dir(output, "all_paths.csv")
 }
 
-//#[djanco(June, 2021, subsets(Python))]
+//#[djanco(subsets(Generic))]
 pub fn all_snapshot_ids(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits()
         .map_into(commit::SnapshotIds)
@@ -72,7 +79,7 @@ pub fn all_snapshot_ids(database: &Database, _log: &Log, output: &Path) -> Resul
         .into_csv_in_dir(output, "all_snapshot_ids.csv")
 }
 
-#[djanco(June, 2021, subsets(Python))]
+#[djanco(subsets(Generic))]
 pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits().map(|commit| {
         let hash = commit.hash().unwrap_or_else(String::new);
@@ -88,7 +95,7 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
             date < timestamp!(December 2008)
         });
 
-        //let date = timestamp.map(|t| {
+        //let date = timestamp.map(|t| /
         //    t.as_utc_rfc2822_string()
         //}).unwrap_or_else(String::new);
 
@@ -96,7 +103,7 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
     }).into_csv_in_dir(output, "python_commit_debug.csv")
 }
 
-// #[djanco(June, 2021, subsets(Python))]
+#[djanco(subsets(Generic))]
 pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     let mut snapshot_dir = PathBuf::from(output);
     snapshot_dir.push("python_snapshots_before_dec2008-2");
@@ -149,7 +156,7 @@ pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) ->
     }).into_files_in_dir(&snapshot_dir)
 }   
 
-//#[djanco(June, 2021, subsets(Python))]
+#[djanco(subsets(Generic))]
 pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
 
     let changes = database.commits() 
