@@ -104,6 +104,34 @@ pub fn python_snapshots_debug(database: &Database, _log: &Log, output: &Path) ->
 }
 
 #[djanco(subsets(Generic))]
+pub fn python_snapshots_debug_interesting(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    database.commits().flat_map(|commit| {
+        let hash = commit.hash().unwrap_or_else(String::new);
+
+        let change_count = commit.change_count().unwrap_or(0);
+
+        let languages = commit.languages().unwrap_or_else(Vec::new);
+        let is_python = languages.contains(&Language::Python);
+
+        let timestamp = commit.author_timestamp();
+        let dec_2008 = timestamp!(December 2008);
+        let before_dec_2008 = timestamp.map_or(false, |date| {
+            date < timestamp!(December 2008)
+        });
+
+        //let date = timestamp.map(|t| /
+        //    t.as_utc_rfc2822_string()
+        //}).unwrap_or_else(String::new);
+
+        if is_python && before_dec_2008 {
+            Some((hash, change_count, is_python, timestamp, dec_2008, before_dec_2008))
+        } else {
+            None
+        }
+    }).into_csv_in_dir(output, "python_commit_debug_just_interesting_commits.csv")
+}
+
+#[djanco(subsets(Generic))]
 pub fn python_snapshots_store(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     let mut snapshot_dir = PathBuf::from(output);
     snapshot_dir.push("python_snapshots_before_dec2008-2");
