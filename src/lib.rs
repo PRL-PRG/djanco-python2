@@ -223,14 +223,15 @@ pub fn python_path_map(database: &Database, _log: &Log, output: &Path) -> Result
 }
 
 #[djanco(subsets(Python, SmallProjects))]
-pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error> {
 
     // Prepare a subdirectory in the output folder to output the snapshot contents into.
     let mut snapshot_dir = PathBuf::from(output);
     snapshot_dir.push("snapshots");
     create_dir_all(snapshot_dir.clone())?;
 
-    let x: Vec<ItemWithData<Snapshot>> = database.commits() 
+    //let x: Vec<ItemWithData<Snapshot>> = 
+    database.commits() 
         // Select commits that occured before 1st Dec 2008. Python 3 was released December 3, 2008, Djanco standard resolution is 1 Month.
         .filter_by(LessThan(commit::AuthoredTimestamp, timestamp!(December 2008)))    
         // Select commits that changed at least one Python file. Python files are recognized by extensions: py, pyi, pyc, pyd, pyo, pyw, pyz
@@ -246,54 +247,10 @@ pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: 
         // Discard all the changes for which we don't have a snapshot (for whatever reason)
         .filter_by(Exists(change::SnapshotId))        
         // -------------- same query ----------------
-        .map(|e| {
-            print!("*{:?} ", e.snapshot_id()); e
-        })
+        // Get the file contents out of the change item
         .map_into(change::Snapshot)
-        .map(|e| {
-            print!("+{:?} ", e.as_ref().map(|e| e.id())); e
-        })
+        // Remove empties
         .flat_map(|option| option) 
-        .map(|e| {
-            print!("{} ", e.id()); e
-        })      
-        //.into_files_in_dir(&snapshot_dir)
-        .collect();
-
-        //  FIXME The problem is with into_files_in_dir:  it only reads the first element from the iterator.
-
-    Ok(())
-    // // Prepare a subdirectory in the output folder to output the snapshot contents into.
-    // let mut snapshot_dir = PathBuf::from(output);
-    // snapshot_dir.push("python_snapshots_before_dec_2008");
-    // create_dir_all(snapshot_dir.clone())?;
-
-    // // // A vector for gathering mappings between snapshot IDs and original file paths, for reference.
-    // let mut mapping_between_snapshots_and_paths: Vec<(SnapshotId, String)> = Vec::new();
-    
-    // // Output the snapshot files into a subdirectory. The name of each snapshot will be the same as their snapshot IDs with no extensions.
-    // // Also: collect mapping between snapshots and original file locations.
-    // for change in changes {
-    //     if let Some(snapshot) = change.snapshot() {
-    //         // Figure out file path for snapshot contents.
-    //         let mut file_path = snapshot_dir.clone();
-    //         file_path.push(format!("{}", snapshot.id()));
-
-    //         // write the contents of the snapshot into the file (preserves original encoding).
-    //         let mut file = OpenOptions::new().write(true).open(file_path)?;
-    //         file.write_all(snapshot.raw_contents())?;
-
-    //         // Record a mapping between the snapshot contents file and the original path.
-    //         let location = change.path().map_or_else(String::new, |path| path.location());
-    //         mapping_between_snapshots_and_paths.push((snapshot.id(), location));
-    //     }
-    // }
-
-    // // Output the relation between file paths and Snapshot IDs into a CSV file for reference.
-    // mapping_between_snapshots_and_paths.into_iter()
-    //     // Save the relation to a CSV file.
-    //     .into_csv_with_headers_in_dir(
-    //         vec!["snapshot_id", "location"], 
-    //         output, 
-    //         "python_changes_before_dec_2008.csv")
+        // Write all the file contents to files, using ids as filenames
+        .into_files_in_dir(&snapshot_dir)
 }

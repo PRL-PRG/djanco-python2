@@ -431,7 +431,6 @@ dependencies = [
 [[package]]
 name = "djanco"
 version = "0.3.4"
-source = "git+https://github.com/PRL-PRG/djanco?branch=main#4cec171475cfca1b2e5eef1f5e9e1bb8bf2b0453"
 dependencies = [
  "anyhow",
  "bstr",
