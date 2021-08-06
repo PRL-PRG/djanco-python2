@@ -198,7 +198,20 @@ use djanco_ext::*;
 //     }).into_files_in_dir(&snapshot_dir)
 // }   
 
-#[djanco(subsets(Python, SmallProjects))]
+#[djanco(subsets(Python))]
+pub fn python_path_map_python(database: &Database, log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    let mut dir = PathBuf::from(output);
+    dir.push("python");
+    python_path_map(database, log, &dir)
+}
+
+#[djanco(subsets(SmallProjects))]
+pub fn python_path_map_small_projects(database: &Database, log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    let mut dir = PathBuf::from(output);
+    dir.push("small_projects");
+    python_path_map(database, log, &dir)
+}
+
 pub fn python_path_map(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error>  {
     database.commits() 
         // Select commits that occured before 1st Dec 2008. Python 3 was released December 3, 2008, Djanco standard resolution is 1 Month.
@@ -222,8 +235,21 @@ pub fn python_path_map(database: &Database, _log: &Log, output: &Path) -> Result
         .into_csv_with_headers_in_dir(vec!["path", "snapshot_id"], output, "paths.csv")
 }
 
-#[djanco(subsets(Python, SmallProjects))]
-pub fn python_snapshots_before_dec2008(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error> {
+#[djanco(subsets(Python))]
+pub fn python_snapshots_python(database: &Database, log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    let mut dir = PathBuf::from(output);
+    dir.push("python");
+    python_snapshots(database, log, &dir)
+}
+
+#[djanco(subsets(SmallProjects))]
+pub fn python_snapshots_small_projects(database: &Database, log: &Log, output: &Path) -> Result<(), std::io::Error>  {
+    let mut dir = PathBuf::from(output);
+    dir.push("small_projects");
+    python_snapshots(database, log, &dir)
+}
+
+pub fn python_snapshots(database: &Database, _log: &Log, output: &Path) -> Result<(), std::io::Error> {
 
     // Prepare a subdirectory in the output folder to output the snapshot contents into.
     let mut snapshot_dir = PathBuf::from(output);
